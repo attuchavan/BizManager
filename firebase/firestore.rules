@@ -1,0 +1,149 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isBusinessMember(businessId) {
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/businesses/$(businessId)/members/$(request.auth.uid)) ||
+        request.auth.uid == businessId ||
+        businessId == "default_business" ||
+        businessId.matches('biz_' + request.auth.uid + '.*')
+      );
+    }
+
+    // Universal Form Submissions audit collection (records copies of all submitted forms)
+    match /form_submissions/{submissionId} {
+      allow read, write: if true;
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isUser(userId);
+
+      match /memberships/{businessId} {
+        allow read, write: if isUser(userId);
+      }
+
+      match /notifications/{notificationId} {
+        allow read, write: if isUser(userId);
+      }
+    }
+
+    // Business workspaces & operational collections
+    match /businesses/{businessId} {
+      // Public directory read for exploring stores and clinics
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isBusinessMember(businessId);
+
+      // Business members
+      match /members/{memberId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isBusinessMember(businessId) || isUser(memberId);
+      }
+
+      // Services catalog (public read for customers exploring and booking)
+      match /services/{serviceId} {
+        allow read: if true;
+        allow write: if isAuthenticated();
+      }
+
+      // Employees (public read of active staff/doctor profiles for booking)
+      match /employees/{employeeId} {
+        allow read: if true;
+        allow write: if isAuthenticated();
+      }
+
+      // Appointments (Permit customer bookings & slot reservations)
+      match /appointments/{appointmentId} {
+        allow read, create: if true;
+        allow update, delete: if isAuthenticated();
+      }
+
+      // CRM Customers collection
+      match /customers/{customerId} {
+        allow read, create, update: if isAuthenticated();
+        allow delete: if isBusinessMember(businessId);
+
+        match /activities/{activityId} {
+          allow read, write: if isAuthenticated();
+        }
+      }
+
+      // Invoices
+      match /invoices/{invoiceId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      // Payments
+      match /payments/{paymentId} {
+        allow read, create, update: if isAuthenticated();
+        allow delete: if isBusinessMember(businessId);
+      }
+
+      // Reviews
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create, update: if isAuthenticated();
+        allow delete: if isBusinessMember(businessId);
+      }
+
+      // Notifications
+      match /notifications/{notificationId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      // Activities log
+      match /activities/{activityId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      // Form Submissions subcollection under business
+      match /form_submissions/{submissionId} {
+        allow read, write: if true;
+      }
+
+      // Settings subcollection
+      match /settings/{settingId} {
+        allow read, write: if isBusinessMember(businessId);
+      }
+
+      // AI Conversations subcollection
+      match /ai_conversations/{conversationId} {
+        allow read, write: if isAuthenticated();
+        match /messages/{messageId} {
+          allow read, write: if isAuthenticated();
+        }
+      }
+
+      // Admin & Pipeline data (leads, expenses, campaigns)
+      match /leads/{leadId} {
+        allow read, update, delete: if isAuthenticated();
+        allow create: if true; // Allows inbound website leads and contact inquiries
+
+        match /notes/{noteId} {
+          allow read, write: if isAuthenticated();
+        }
+        match /activities/{activityId} {
+          allow read, write: if isAuthenticated();
+        }
+      }
+      match /expenses/{expenseId} {
+        allow read, write: if isAuthenticated();
+      }
+      match /campaigns/{campaignId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+  }
+}
