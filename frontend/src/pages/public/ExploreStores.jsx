@@ -18,9 +18,12 @@ import {
   ArrowLeft,
   X,
   Users,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import {
   getAllBusinesses,
   getBusiness,
@@ -38,6 +41,7 @@ export default function ExploreStores({
   onNavigateToPortalTab,
 }) {
   const { currentUser, userProfile, activeBusiness } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
   const [businesses, setBusinesses] = useState([]);
@@ -233,7 +237,22 @@ export default function ExploreStores({
               </div>
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Theme Toggle Button */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition"
+                aria-label="Toggle theme"
+              >
+                {isDark ? (
+                  <Sun size={15} className="text-amber-400" />
+                ) : (
+                  <Moon size={15} className="text-slate-600 dark:text-slate-300" />
+                )}
+              </button>
+
               {currentUser ? (
                 <Link
                   to="/customer/portal"

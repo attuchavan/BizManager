@@ -19,8 +19,11 @@ import {
   ArrowLeft,
   Menu,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function CustomerHeader({
   activeTab,
@@ -36,6 +39,7 @@ export default function CustomerHeader({
   loading = false,
 }) {
   const { currentUser, userProfile, logout, memberships } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -194,10 +198,24 @@ export default function CustomerHeader({
             <span>{terminology?.bookAppointment || "Book Appointment"}</span>
           </button>
 
+          {/* Theme Toggle (Dark / Light) */}
+          <button
+            onClick={toggleTheme}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition"
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun size={15} className="text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+            ) : (
+              <Moon size={15} className="text-slate-600 dark:text-slate-300 transition-transform -rotate-12 hover:rotate-0" />
+            )}
+          </button>
+
           {/* Notifications Bell */}
           <button
             onClick={onOpenNotifications}
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition"
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition"
             title="Notifications"
           >
             <Bell size={15} />
@@ -262,6 +280,21 @@ export default function CustomerHeader({
                   >
                     <Star size={14} className="text-amber-500" />
                     <span>My Reviews</span>
+                  </button>
+
+                  {/* Dark/Light mode toggle in profile menu */}
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                  >
+                    <div className="flex items-center gap-2">
+                      {isDark ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} className="text-indigo-400" />}
+                      <span>Theme Mode</span>
+                    </div>
+                    <span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold">
+                      {isDark ? "Dark" : "Light"}
+                    </span>
                   </button>
 
                   {/* If user is business owner/staff, show jump back to management */}

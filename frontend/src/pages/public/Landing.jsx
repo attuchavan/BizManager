@@ -17,13 +17,14 @@ import {
   Send,
   Loader2,
   CheckCircle2,
-  Phone,
-  Mail,
   Briefcase,
   AlertCircle,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { createLead } from "../../services/firebase/leads";
 import { recordFormSubmission } from "../../services/firebase/formSubmissions";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,12 +94,14 @@ export default function Landing() {
     }
   }
 
+  const { theme, setTheme, toggleTheme, isDark } = useTheme();
+
   return (
-    <div className="min-h-screen bg-slate-50/60 font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white transition-colors">
       {/* ------------------------------------------------------------- */}
       {/* CLEAN, COMFORTABLE TOPBAR                                     */}
       {/* ------------------------------------------------------------- */}
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors">
         <div className="mx-auto flex h-16 sm:h-20 max-w-6xl items-center justify-between px-4 sm:px-8">
           {/* Brand Logo - exactly matching dashboard */}
           <Link to="/" className="flex items-center gap-3 group">
@@ -106,52 +109,67 @@ export default function Landing() {
               AI
             </div>
             <div>
-              <p className="text-base font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+              <p className="text-base font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
                 BizManager
               </p>
-              <p className="text-[11px] font-medium text-slate-400">
+              <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
                 Intelligent Workspace
               </p>
             </div>
           </Link>
 
-          {/* Simple, peaceful links (Only 2 essential links - no cluttered all-caps!) */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
+          {/* Simple, peaceful links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
             <a
               href="#features"
-              className="hover:text-slate-900 transition-colors"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               Features
             </a>
             <a
               href="#portals"
-              className="hover:text-slate-900 transition-colors"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               Who It's For
             </a>
             <Link
               to="/explore"
-              className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+              className="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
             >
               Explore Stores & Doctors
             </Link>
             <Link
               to="/customer/portal"
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               Client Portal
             </Link>
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white/80 text-slate-600 shadow-xs hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition"
+              aria-label="Toggle theme"
+            >
+              {isDark ? (
+                <Sun size={17} className="text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+              ) : (
+                <Moon size={17} className="text-slate-600 dark:text-slate-300 transition-transform -rotate-12 hover:rotate-0" />
+              )}
+            </button>
+
             <Link
               to="/login"
-              className="rounded-lg px-3.5 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+              className="hidden sm:inline-block rounded-lg px-3.5 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
             >
               Sign In
             </Link>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div className="hidden sm:block" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/register"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/25 hover:bg-blue-500 transition-colors"
@@ -160,16 +178,16 @@ export default function Landing() {
                 <ArrowRight size={14} />
               </Link>
             </motion.div>
-          </div>
 
-          {/* Mobile hamburger button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 md:hidden"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            {/* Mobile hamburger button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu dropdown */}
@@ -179,47 +197,86 @@ export default function Landing() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-b border-slate-100 bg-white px-6 py-4 md:hidden"
+              className="overflow-hidden border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-4 md:hidden shadow-xl"
             >
-              <div className="flex flex-col space-y-3 text-sm font-medium text-slate-700">
+              <div className="flex flex-col space-y-3 text-sm font-medium text-slate-700 dark:text-slate-200">
                 <a
                   href="#features"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-blue-600"
+                  className="py-1 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   Features
                 </a>
                 <a
                   href="#portals"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-blue-600"
+                  className="py-1 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   Who It's For
                 </a>
                 <Link
                   to="/explore"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 text-blue-600 font-semibold hover:text-blue-700"
+                  className="py-1 text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700"
                 >
                   Explore Stores & Doctors
                 </Link>
                 <Link
                   to="/customer/portal"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-blue-600"
+                  className="py-1 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   Client Portal
                 </Link>
-                <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+
+                {/* Mobile View: Dedicated Dark & Light Mode Switch */}
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span>Appearance</span>
+                    <span className="text-[11px] font-bold uppercase text-indigo-600 dark:text-indigo-400">
+                      {isDark ? "Dark Mode" : "Light Mode"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setTheme("light")}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${
+                        !isDark
+                          ? "bg-white text-slate-900 shadow-xs dark:bg-slate-700 dark:text-white"
+                          : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    >
+                      <Sun size={14} className={!isDark ? "text-amber-500" : ""} />
+                      <span>Light</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTheme("dark")}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${
+                        isDark
+                          ? "bg-slate-800 text-white shadow-xs dark:bg-slate-700 dark:text-white"
+                          : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    >
+                      <Moon size={14} className={isDark ? "text-indigo-400" : ""} />
+                      <span>Dark</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
                   <Link
                     to="/login"
-                    className="w-full text-center rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center rounded-xl border border-slate-200 dark:border-slate-700 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="w-full text-center rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
                   >
                     Get Started Free
                   </Link>

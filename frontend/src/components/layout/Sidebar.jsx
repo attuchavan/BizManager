@@ -18,8 +18,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const navigation = [
   {
@@ -115,6 +118,7 @@ const navigation = [
 
 function Sidebar({ mobileOpen, onClose, isCollapsed, onToggleCollapse }) {
   const { activeBusiness } = useAuth();
+  const { theme, setTheme, toggleTheme, isDark } = useTheme();
   const businessName = activeBusiness?.businessName || "My Business";
   const initials = businessName
     .split(" ")
@@ -277,14 +281,64 @@ function Sidebar({ mobileOpen, onClose, isCollapsed, onToggleCollapse }) {
           ))}
         </nav>
 
-        {/* Bottom Workspace Card / Settings - Fixed at bottom */}
-        <div className="shrink-0 border-t border-slate-100 p-3 dark:border-slate-800/70">
+        {/* Bottom Workspace Card, Theme Toggle & Settings - Fixed at bottom */}
+        <div className="shrink-0 border-t border-slate-100 p-3 dark:border-slate-800/70 space-y-2">
+          {/* Theme Option in Sidebar (Highlighted for mobile view and desktop) */}
+          {!isCollapsed ? (
+            <div>
+              <div className="mb-1.5 flex items-center justify-between px-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                <span>Appearance</span>
+                <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                  {isDark ? "Dark Mode" : "Light Mode"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1 rounded-xl border border-slate-200/80 bg-slate-100/80 p-1 dark:border-slate-800 dark:bg-slate-900/80">
+                <button
+                  type="button"
+                  onClick={() => setTheme("light")}
+                  className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition ${
+                    !isDark
+                      ? "bg-white text-slate-900 shadow-xs dark:bg-slate-800 dark:text-white"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  }`}
+                  aria-label="Light mode"
+                >
+                  <Sun size={14} className={!isDark ? "text-amber-500" : ""} />
+                  <span>Light</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTheme("dark")}
+                  className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition ${
+                    isDark
+                      ? "bg-slate-800 text-white shadow-xs dark:bg-slate-700 dark:text-white"
+                      : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  }`}
+                  aria-label="Dark mode"
+                >
+                  <Moon size={14} className={isDark ? "text-indigo-400" : ""} />
+                  <span>Dark</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              className="flex h-10 w-full items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
+            </button>
+          )}
+
           <NavLink
             to="/app/settings"
             onClick={onClose}
             title={isCollapsed ? "Settings" : undefined}
             className={({ isActive }) => `
-              flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
+              flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition
               ${isCollapsed ? "justify-center px-0" : ""}
               ${
                 isActive
@@ -298,14 +352,14 @@ function Sidebar({ mobileOpen, onClose, isCollapsed, onToggleCollapse }) {
           </NavLink>
 
           {!isCollapsed && (
-            <div className="mt-3 rounded-xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-3.5 text-white shadow-sm border border-indigo-500/20">
+            <div className="rounded-xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-3 text-white shadow-sm border border-indigo-500/20">
               <div className="flex items-center gap-2">
                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
                   <Bot size={14} />
                 </div>
                 <span className="text-xs font-bold tracking-wide">AI Assistant Ready</span>
               </div>
-              <p className="mt-1.5 text-[11px] leading-4 text-slate-300">
+              <p className="mt-1 text-[11px] leading-4 text-slate-300">
                 Automate customer follow-ups and schedule reviews with 1 click.
               </p>
             </div>

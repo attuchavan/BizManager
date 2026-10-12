@@ -108,9 +108,9 @@ function Topbar({ onMenuClick }) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-18 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-md transition-colors md:px-6 dark:border-slate-800/80 dark:bg-slate-950/80">
+    <header className="sticky top-0 z-30 flex h-18 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/80 px-3 backdrop-blur-md transition-colors sm:px-6 dark:border-slate-800/80 dark:bg-slate-950/80">
       {/* LEFT SECTION */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={onMenuClick}
           className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 lg:hidden dark:text-slate-300 dark:hover:bg-slate-900"
@@ -144,7 +144,7 @@ function Topbar({ onMenuClick }) {
       </div>
 
       {/* RIGHT CONTROLS */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         {/* Quick Add Action */}
         <div className="relative" ref={quickAddRef}>
           <button
@@ -255,13 +255,13 @@ function Topbar({ onMenuClick }) {
         <button
           onClick={toggleTheme}
           title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100"
           aria-label="Toggle theme"
         >
           {isDark ? (
             <Sun size={18} className="text-amber-400 transition-transform rotate-0 hover:rotate-45" />
           ) : (
-            <Moon size={18} className="text-slate-600 transition-transform -rotate-12 hover:rotate-0" />
+            <Moon size={18} className="text-slate-600 dark:text-slate-300 transition-transform -rotate-12 hover:rotate-0" />
           )}
         </button>
 
@@ -384,6 +384,24 @@ function Topbar({ onMenuClick }) {
                   <User size={15} />
                   <span>Profile & Preferences</span>
                 </Link>
+
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {isDark ? (
+                      <Sun size={15} className="text-amber-400" />
+                    ) : (
+                      <Moon size={15} className="text-indigo-500" />
+                    )}
+                    <span>{isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}</span>
+                  </div>
+                  <span className="rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                    {isDark ? "Dark" : "Light"}
+                  </span>
+                </button>
 
                 <button
                   onClick={handleLogout}

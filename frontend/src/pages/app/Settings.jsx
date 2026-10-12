@@ -18,9 +18,12 @@ import {
   Layers,
   QrCode,
   Smartphone,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import PageHeader from "../../components/common/PageHeader";
 import PageLoader from "../../components/common/PageLoader";
 import { doc, updateDoc } from "firebase/firestore";
@@ -34,6 +37,7 @@ import { recordFormSubmission } from "../../services/firebase/formSubmissions";
 
 export default function Settings() {
   const { activeBusiness, userProfile, currentUser, updateActiveBusiness } = useAuth();
+  const { theme, setTheme, toggleTheme, isDark } = useTheme();
 
   const [form, setForm] = useState({
     businessName: "",
@@ -481,6 +485,55 @@ export default function Settings() {
                   className="h-4 w-4 rounded accent-blue-600"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Appearance & Theme Settings Card */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <Sun size={16} className="text-amber-500" />
+              Appearance & Theme Mode
+            </h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Customize workspace theme for desktop and mobile screens.
+            </p>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
+                  !isDark
+                    ? "border-blue-500 bg-blue-50/50 text-blue-900 ring-2 ring-blue-500/20 dark:bg-blue-950/20 dark:text-blue-200"
+                    : "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
+                }`}
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-xs border border-slate-200 text-amber-500">
+                  <Sun size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white">Light Mode</p>
+                  <p className="text-[10px] text-slate-400">Crisp, clean high-contrast</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition ${
+                  isDark
+                    ? "border-indigo-500 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500/20 dark:bg-indigo-950/20 dark:text-indigo-200"
+                    : "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
+                }`}
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-800 shadow-xs border border-slate-700 text-indigo-400">
+                  <Moon size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white">Dark Mode</p>
+                  <p className="text-[10px] text-slate-400">Sleek, low-glare dark view</p>
+                </div>
+              </button>
             </div>
           </div>
         </div>
