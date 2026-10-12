@@ -29,7 +29,7 @@ export default function EmailVerification() {
       if (user && user.emailVerified) {
         setMessage("Email verified successfully! Redirecting...");
         setTimeout(() => {
-          if (role === "customer" || userProfile?.accountType === "customer") {
+          if (role === "customer" || role === "client" || userProfile?.accountType === "customer" || userProfile?.accountType === "client") {
             navigate("/customer/portal");
           } else {
             navigate("/app");
@@ -65,7 +65,7 @@ export default function EmailVerification() {
   }
 
   function handleSkip() {
-    if (role === "customer" || userProfile?.accountType === "customer") {
+    if (role === "customer" || role === "client" || userProfile?.accountType === "customer" || userProfile?.accountType === "client") {
       navigate("/customer/portal");
     } else {
       navigate("/app");

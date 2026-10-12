@@ -25,10 +25,10 @@ function Login() {
 
       const user = await loginUser(email, password);
 
-      // Check if user is a customer or business owner
+      // Check if user is a customer/client or business owner / admin
       const profile = await getUserProfile(user.uid);
 
-      if (profile?.accountType === "customer") {
+      if (profile?.accountType === "customer" || profile?.accountType === "client") {
         navigate("/customer/portal");
       } else {
         navigate("/app");

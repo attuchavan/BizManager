@@ -66,8 +66,11 @@ export function AuthProvider({ children }) {
             }
           }
 
-          // If no memberships found, auto-provision a default workspace
-          if (!userMemberships || userMemberships.length === 0) {
+          // If no memberships found and user is a business owner or admin, auto-provision a default workspace
+          const isClientOnly =
+            profile?.accountType === "client" || profile?.accountType === "customer";
+
+          if (!isClientOnly && (!userMemberships || userMemberships.length === 0)) {
             const defaultBizName = profile?.name ? `${profile.name}'s Business` : "My Business";
             let defaultBizId = `biz_${firebaseUser.uid.slice(0, 12)}`;
 
@@ -93,7 +96,7 @@ export function AuthProvider({ children }) {
             userMemberships = [initialMembership];
           }
 
-          setMemberships(userMemberships);
+          setMemberships(userMemberships || []);
 
           if (userMemberships.length > 0) {
             const savedBusinessId = localStorage.getItem("activeBusinessId");

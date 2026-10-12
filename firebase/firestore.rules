@@ -25,7 +25,7 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
-    // User profile documents
+    // User profile documents (Universal master identity)
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isUser(userId);
@@ -37,6 +37,24 @@ service cloud.firestore {
       match /notifications/{notificationId} {
         allow read, write: if isUser(userId);
       }
+    }
+
+    // Dedicated Platform Admins collection
+    match /admins/{adminId} {
+      allow read: if isAuthenticated();
+      allow write: if isUser(adminId);
+    }
+
+    // Dedicated Business Owners collection
+    match /business_owners/{ownerId} {
+      allow read: if true; // Public store / clinic directory overview
+      allow write: if isUser(ownerId);
+    }
+
+    // Dedicated Clients / Patients / Customers collection
+    match /clients/{clientId} {
+      allow read: if isAuthenticated();
+      allow write: if isUser(clientId) || isAuthenticated();
     }
 
     // Business workspaces & operational collections

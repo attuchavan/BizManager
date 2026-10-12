@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Loader2,
   Phone,
+  ShieldCheck,
 } from "lucide-react";
 import { registerUser } from "../../services/firebase/auth";
 import { createUserProfile } from "../../services/firebase/users";
@@ -37,8 +38,13 @@ function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Mode: 'business' | 'customer'
-  const initialMode = searchParams.get("type") === "customer" ? "customer" : "business";
+  // Mode: 'business' | 'customer' | 'admin'
+  const initialMode =
+    searchParams.get("type") === "admin"
+      ? "admin"
+      : searchParams.get("type") === "customer" || searchParams.get("type") === "client"
+      ? "customer"
+      : "business";
   const [accountType, setAccountType] = useState(initialMode);
 
   const [form, setForm] = useState({
@@ -91,13 +97,15 @@ function Register() {
       });
 
       if (accountType === "business") {
-        // Business Owner / Admin Registration
+        // Business Owner: Saved to universal 'users' AND dedicated 'business_owners'
         await createUserProfile({
           uid: user.uid,
           name: form.name.trim(),
           email: form.email.trim(),
           accountType: "business_owner",
           phone: form.phone.trim(),
+          businessName: form.businessName.trim(),
+          businessType: form.businessType,
         });
 
         await createBusiness({
@@ -107,8 +115,20 @@ function Register() {
         });
 
         navigate("/verify-email?role=business");
+      } else if (accountType === "admin") {
+        // Platform Admin: Saved to universal 'users' AND dedicated 'admins'
+        await createUserProfile({
+          uid: user.uid,
+          name: form.name.trim(),
+          email: form.email.trim(),
+          accountType: "admin",
+          role: "ADMIN",
+          phone: form.phone.trim(),
+        });
+
+        navigate("/verify-email?role=admin");
       } else {
-        // Customer / Client Registration
+        // Client / Customer: Saved to universal 'users' AND dedicated 'clients'
         await createUserProfile({
           uid: user.uid,
           name: form.name.trim(),
@@ -139,23 +159,24 @@ function Register() {
   return (
     <AuthLayout
       title="Create account"
-      subtitle="Choose your account type to get started."
+      subtitle="Select your role to access your dedicated workspace."
     >
-      {/* Account Type Selector */}
-      <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1">
+      {/* Account Type Selector (Dedicated Firebase Collections) */}
+      <div className="mb-5 grid grid-cols-3 gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
         <button
           type="button"
           onClick={() => {
             setAccountType("business");
             setError("");
           }}
-          className={`rounded-lg py-2 text-xs font-semibold transition-all ${
+          className={`flex items-center justify-center gap-1.5 rounded-lg py-2 px-1 text-[11px] font-semibold transition-all ${
             accountType === "business"
               ? "bg-white text-indigo-600 shadow-sm font-bold"
               : "text-slate-500 hover:text-slate-900"
           }`}
         >
-          Business Owner
+          <Building2 size={13} className="shrink-0" />
+          <span className="truncate">Owner</span>
         </button>
 
         <button
@@ -164,13 +185,30 @@ function Register() {
             setAccountType("customer");
             setError("");
           }}
-          className={`rounded-lg py-2 text-xs font-semibold transition-all ${
+          className={`flex items-center justify-center gap-1.5 rounded-lg py-2 px-1 text-[11px] font-semibold transition-all ${
             accountType === "customer"
               ? "bg-white text-indigo-600 shadow-sm font-bold"
               : "text-slate-500 hover:text-slate-900"
           }`}
         >
-          Client / Customer
+          <User size={13} className="shrink-0" />
+          <span className="truncate">Client</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setAccountType("admin");
+            setError("");
+          }}
+          className={`flex items-center justify-center gap-1.5 rounded-lg py-2 px-1 text-[11px] font-semibold transition-all ${
+            accountType === "admin"
+              ? "bg-white text-purple-600 shadow-sm font-bold"
+              : "text-slate-500 hover:text-slate-900"
+          }`}
+        >
+          <ShieldCheck size={13} className="shrink-0" />
+          <span className="truncate">Admin</span>
         </button>
       </div>
 
@@ -276,29 +314,30 @@ function Register() {
           </>
         )}
 
-        {/* Phone Number (For Clients) */}
-        {accountType === "customer" && (
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700">
-              Phone Number
-            </label>
-            <div className="relative">
-              <Phone
-                size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                type="tel"
-                placeholder="+91 98765 43210"
-                required
-                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
+        {/* Phone Number */}
+        <div>
+          <label className="mb-1 flex items-center justify-between text-xs font-semibold text-slate-700">
+            <span>Phone Number</span>
+            {accountType !== "customer" && (
+              <span className="text-[10px] font-normal text-slate-400">Optional</span>
+            )}
+          </label>
+          <div className="relative">
+            <Phone
+              size={16}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              type="tel"
+              placeholder="+91 98765 43210"
+              required={accountType === "customer"}
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            />
           </div>
-        )}
+        </div>
 
         {/* Password */}
         <div>
@@ -346,6 +385,8 @@ function Register() {
               <span>
                 {accountType === "business"
                   ? "Create Business Account"
+                  : accountType === "admin"
+                  ? "Create Admin Account"
                   : "Create Client Account"}
               </span>
               <ArrowRight size={15} />

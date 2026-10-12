@@ -22,7 +22,7 @@ function ProtectedRoute({ children }) {
 
   // If the user registered as a customer/client and attempts to access the internal /app dashboard, route them to their customer portal
   if (
-    userProfile?.accountType === "customer" &&
+    (userProfile?.accountType === "customer" || userProfile?.accountType === "client") &&
     location.pathname.startsWith("/app")
   ) {
     return <Navigate to="/customer/portal" replace />;
